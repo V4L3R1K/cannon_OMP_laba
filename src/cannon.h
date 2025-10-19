@@ -2,5 +2,6 @@
 #define CANNON_H
 
 void multiply_matrix_cannon_seq(int **A, int **B, int **C, int n, int blocks_per_dim);
+void multiply_matrix_cannon_par(int **A, int **B, int **C, int n, int blocks_per_dim, int threads);
 
 #endif

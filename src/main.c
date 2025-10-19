@@ -102,18 +102,65 @@ double experiment_seq(int n, int blocks_per_dim, int repeats, int random_seed)
     return time_sum / repeats;
 }
 
+double experiment_par(int n, int blocks_per_dim, int threads, int repeats, int random_seed)
+{
+    srand(random_seed);
+
+    int **A = 0, **B = 0, **C = 0;
+    double time_start = 0., time_end = 0., time_sum = 0.;
+
+    for (int i = 0; i < repeats; i++)
+    {
+        if (!generate_square_matrix(n, &A) || !generate_square_matrix(n, &B) || !generate_zero_square_matrix(n, &C))
+        {
+            fprintf(stderr, "Unable to generate matrix\n");
+            return -1;
+        }
+
+        time_start = omp_get_wtime();
+        multiply_matrix_cannon_par(A, B, C, n, blocks_per_dim, threads);
+        time_end = omp_get_wtime();
+
+        time_sum += time_end - time_start;
+
+        free_matrix(n, A);
+        free_matrix(n, B);
+        free_matrix(n, C);
+    }
+
+    return time_sum / repeats;
+}
+
 int main(int argc, char **argv)
 {
     const int random_seed = 69420;
 
+    /* seq
     int blocks_per_dim = 1, repeats = 50;
+    double time_avg = 0.;
+
     printf("blocks_per_dim=%d repeats=%d seed=%d\n", blocks_per_dim, repeats, random_seed);
     printf("n\ttime_avg\n");
-    double time_avg = 0.;
+
     for (int n = 10; n <= 250; n += 10)
     {
         time_avg = experiment_seq(n, blocks_per_dim, repeats, random_seed);
         printf("%d\t%.9f\n", n, time_avg);
+    }
+    */
+
+    /* par */
+    int blocks_per_dim = 1, repeats = 1, n = 144 * 9;
+    double time_avg = 0.;
+
+    printf("n=%d repeats=%d seed=%d\n", n, repeats, random_seed);
+    printf("threads\ttime_avg\n");
+
+    for (int threads = 1; threads <= 16; threads += 1)
+    {
+        blocks_per_dim = 16 * 9;
+        time_avg = experiment_par(n, blocks_per_dim, threads, repeats, random_seed);
+        printf("%d\t%.9f\n", threads, time_avg);
     }
 
     return 0;
