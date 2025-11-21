@@ -206,47 +206,52 @@ int main(int argc, char **argv)
     const int random_seed = 69420;
 
     /* seq*/
-    int blocks_per_dim = 1, threads = 16, repeats = 1, n = 144 * 9;
-    double time_avg = 0.;
-    printf("blocks");
-    for (n = 8; n <= 1024+8; n += 8)
-    {
-        printf(" %d", n);
-    }
-    n = 1024;
-    printf("\ntime");
-    // printf("\n%d", blocks_per_dim);
-    for (blocks_per_dim = 8; blocks_per_dim <= 1024+8; blocks_per_dim+=8 )
-    {
-        threads = blocks_per_dim * blocks_per_dim;
-        // printf("\n%d", blocks_per_dim);
-        // for (n = 16; n <= 1024; n += 16)
-        // {
-        time_avg = experiment_seq(n, blocks_per_dim, repeats, random_seed);
-        printf("\t%.9f", time_avg);
-        fflush(stdout);
-        // }
-    }
-    puts("");
-    /* par */
-    // int blocks_per_dim = 1, threads = 16, repeats = 30, n = 144 * 9;
+    // int blocks_per_dim = 1, threads = 16, repeats = 1, n = 144 * 9;
     // double time_avg = 0.;
-    // printf("threads");
-    // for (n = 64; n <= 1024; n += 64)
+    // printf("blocks");
+    // for (n = 8; n <= 1024+8; n += 8)
     // {
     //     printf(" %d", n);
     // }
-    // for (blocks_per_dim = 6; blocks_per_dim >= 1; blocks_per_dim--)
+    // n = 1024;
+    // printf("\ntime");
+    // // printf("\n%d", blocks_per_dim);
+    // for (blocks_per_dim = 8; blocks_per_dim <= 1024+8; blocks_per_dim+=8 )
     // {
     //     threads = blocks_per_dim * blocks_per_dim;
-    //     printf("\n%d", threads);
-    //     for (n = 64; n <= 1024; n += 64)
-    //     {
-    //         time_avg = experiment_par_stack(n, blocks_per_dim, threads, repeats, random_seed);
-    //         printf(" %.9f", time_avg);
-    //         fflush(stdout);
-    //     }
-    // }                                       
+    //     // printf("\n%d", blocks_per_dim);
+    //     // for (n = 16; n <= 1024; n += 16)
+    //     // {
+    //     time_avg = experiment_seq(n, blocks_per_dim, repeats, random_seed);
+    //     printf("\t%.9f", time_avg);
+    //     fflush(stdout);
+    //     // }
+    // }
+    // puts("");
+    /* par */
+    int blocks_per_dim = 1, threads = 16, repeats = 30, n = 144 * 9;
+    double time_avg = 0.;
+    
+    puts("Расчет зависимости времени от размера матриц и от количества потоков.");
+    puts("От 36 до 1 потока, и от 64 до 1024 размеры матриц.");
+
+    printf("threads");
+    for (n = 64; n <= 1024; n += 64)
+    {
+        printf(" %d", n);
+    }
+    for (blocks_per_dim = 6; blocks_per_dim >= 1; blocks_per_dim--)
+    {
+        threads = blocks_per_dim * blocks_per_dim;
+        printf("\n%d", threads);
+        for (n = 64; n <= 1024; n += 64)
+        {
+            time_avg = experiment_par_stack(n, blocks_per_dim, threads, repeats, random_seed);
+            printf(" %.9f", time_avg);
+            fflush(stdout);
+        }
+    }           
+    puts("");
     return 0;
 }
 
